@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// Product List View
 struct ProductListView: View {
     @StateObject private var viewModel = ProductListViewModel()
     @EnvironmentObject var favoritesViewModel: FavoritesViewModel
@@ -21,7 +22,7 @@ struct ProductListView: View {
                     }
 
                 ScrollView {
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))], spacing: 16) {
                         ForEach(viewModel.displayedProducts) { product in
                             NavigationLink(destination: ProductDetailView(product: product)) {
                                 ProductCardView(product: product)
@@ -31,10 +32,23 @@ struct ProductListView: View {
                         }
                     }
                     .padding()
-                    
+                    .background(GeometryReader { geo -> Color in
+                        DispatchQueue.main.async {
+                            if geo.frame(in: .global).maxY < UIScreen.main.bounds.height {
+                                viewModel.loadMoreProducts()
+                            }
+                        }
+                        return Color.clear
+                    })
+
                     if viewModel.isLoadingMore {
                         ProgressView()
                             .padding()
+                    }
+                }
+                .onAppear {
+                    if viewModel.displayedProducts.isEmpty {
+                        viewModel.loadMoreProducts()
                     }
                 }
             }

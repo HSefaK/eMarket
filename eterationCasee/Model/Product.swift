@@ -11,4 +11,10 @@ struct Product: Identifiable, Codable {
     let price: String
     let image: String
     let description: String
+
+    var numericPrice: Double {
+        // Fiyatı sadece sayı kısmını alarak Double'a dönüştürüyoruz
+        let cleanedPrice = price.replacingOccurrences(of: "[^0-9.]", with: "", options: .regularExpression)
+        return Double(cleanedPrice) ?? 0.0
+    }
 }

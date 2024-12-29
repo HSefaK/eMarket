@@ -13,46 +13,65 @@ struct ProductDetailView: View {
     @EnvironmentObject var favoritesViewModel: FavoritesViewModel
 
     var body: some View {
-        VStack {
-            ZStack(alignment: .topTrailing) {
-                AsyncImage(url: URL(string: product.image)) { image in
-                    image.resizable().aspectRatio(contentMode: .fit)
-                } placeholder: {
-                    Color.gray
-                }
-                .frame(height: 300)
-                
-                Button(action: {
-                    if favoritesViewModel.favorites.contains(where: { $0.id == product.id }) {
-                        favoritesViewModel.removeFromFavorites(product)
-                    } else {
-                        favoritesViewModel.addToFavorites(product)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                // Ürün görseli
+                ZStack(alignment: .topTrailing) {
+                    AsyncImage(url: URL(string: product.image)) { image in
+                        image.resizable().aspectRatio(contentMode: .fit)
+                    } placeholder: {
+                        Color.gray
                     }
-                }) {
-                    Image(systemName: favoritesViewModel.favorites.contains(where: { $0.id == product.id }) ? "star.fill" : "star")
-                        .foregroundColor(.yellow)
-                        .padding()
+                    .frame(height: 300)
+
+                    // Favori butonu
+                    Button(action: {
+                        if favoritesViewModel.favorites.contains(where: { $0.id == product.id }) {
+                            favoritesViewModel.removeFromFavorites(product)
+                        } else {
+                            favoritesViewModel.addToFavorites(product)
+                        }
+                    }) {
+                        Image(systemName: favoritesViewModel.favorites.contains(where: { $0.id == product.id }) ? "star.fill" : "star")
+                            .foregroundColor(.yellow)
+                            .padding()
+                    }
                 }
-            }
-            
-            Text(product.name)
-                .font(.title)
 
-            Text("\(product.price)₺")
-                .font(.title2)
-                .foregroundColor(.blue)
+                // Ürün adı
+                Text(product.name)
+                    .font(.title)
+                    .bold()
 
-            Spacer()
+                // Ürün fiyatı
+                Text("\(product.price)₺")
+                    .font(.title2)
+                    .foregroundColor(.blue)
 
-            Button("Add to Cart") {
-                cartViewModel.addToCart(product: product)
+                // Ürün açıklaması
+                Text("Description")
+                    .font(.headline)
+                Text(product.description)
+                    .font(.body)
+                    .foregroundColor(.secondary)
+
+                Spacer()
+
+                // Sepete ekleme butonu
+                Button(action: {
+                    cartViewModel.addToCart(product: product)
+                }) {
+                    Text("Add to Cart")
+                        .font(.headline)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
             }
             .padding()
-            .frame(maxWidth: .infinity)
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(8)
         }
-        .padding()
+        .navigationTitle("Product Details")
     }
 }

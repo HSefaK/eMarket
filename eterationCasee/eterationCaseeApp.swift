@@ -9,29 +9,28 @@
 import SwiftUI
 
 @main
-struct EMarketApp: App {
+struct eterationCaseeApp: App {
     var body: some Scene {
         WindowGroup {
             MainTabView()
                 .environmentObject(CartViewModel())
+                .environmentObject(FavoritesViewModel())
         }
     }
 }
 
 // Main Tab View
 struct MainTabView: View {
-    @StateObject private var favoritesViewModel = FavoritesViewModel()
+    @EnvironmentObject var cartViewModel: CartViewModel
 
     var body: some View {
         TabView {
             ProductListView()
-                .environmentObject(favoritesViewModel)
                 .tabItem {
-                    Label("Products", systemImage: "house")
+                    Label("Home", systemImage: "house")
                 }
 
             FavoritesView()
-                .environmentObject(favoritesViewModel)
                 .tabItem {
                     Label("Favorites", systemImage: "star")
                 }
@@ -40,11 +39,15 @@ struct MainTabView: View {
                 .tabItem {
                     Label("Cart", systemImage: "cart")
                 }
+                .badge(cartViewModel.totalItemCount > 0 ? cartViewModel.totalItemCount : 0) // Badge gösterimi
 
             ProfileView()
                 .tabItem {
                     Label("Profile", systemImage: "person")
                 }
+        }
+        .onAppear {
+            cartViewModel.loadCart() // Uygulama açıldığında cart'ı yükle
         }
     }
 }

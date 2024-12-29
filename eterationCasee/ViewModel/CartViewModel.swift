@@ -11,6 +11,10 @@ import Foundation
 class CartViewModel: ObservableObject {
     @Published var cartItems: [CartItem] = []
 
+    var totalItemCount: Int {
+        cartItems.reduce(0) { $0 + $1.quantity }
+    }
+
     func addToCart(product: Product) {
         if let index = cartItems.firstIndex(where: { $0.product.id == product.id }) {
             cartItems[index].quantity += 1
@@ -21,15 +25,26 @@ class CartViewModel: ObservableObject {
     }
 
     func updateQuantity(item: CartItem, quantity: Int) {
-        if let index = cartItems.firstIndex(where: { $0.id == item.id }) {
-            cartItems[index].quantity = quantity
+        if let index = cartItems.firstIndex(where: { $0.product.id == item.product.id }) {
+            if quantity <= 0 {
+                cartItems.remove(at: index)
+            } else {
+                cartItems[index].quantity = quantity
+            }
         }
         saveCart()
     }
 
+    func removeItem(item: CartItem) {
+        cartItems.removeAll { $0.product.id == item.product.id }
+        saveCart()
+    }
+
     func calculateTotal() -> String {
-        let total = cartItems.reduce(0) { $0 + (Int($1.product.price) ?? 0) * $1.quantity }
-        return "\(total)₺"
+        let total = cartItems.reduce(0.0) { result, cartItem in
+            return result + (cartItem.product.numericPrice * Double(cartItem.quantity))
+        }
+        return String(format: "%.2f₺", total)
     }
 
     private func saveCart() {

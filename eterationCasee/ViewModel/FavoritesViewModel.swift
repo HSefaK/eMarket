@@ -6,9 +6,18 @@
 //
 
 import Combine
+import Foundation
 
 class FavoritesViewModel: ObservableObject {
-    @Published var favorites: [Product] = []
+    @Published var favorites: [Product] = [] {
+        didSet {
+            saveFavorites()
+        }
+    }
+
+    init() {
+        loadFavorites()
+    }
 
     func addToFavorites(_ product: Product) {
         if !favorites.contains(where: { $0.id == product.id }) {
@@ -23,5 +32,17 @@ class FavoritesViewModel: ObservableObject {
   func isFavorite(product: Product) -> Bool {
       return favorites.contains(where: { $0.id == product.id })
   }
-}
 
+    private func saveFavorites() {
+        if let data = try? JSONEncoder().encode(favorites) {
+            UserDefaults.standard.set(data, forKey: "favorites")
+        }
+    }
+
+    private func loadFavorites() {
+        if let data = UserDefaults.standard.data(forKey: "favorites"),
+           let items = try? JSONDecoder().decode([Product].self, from: data) {
+            favorites = items
+        }
+    }
+}

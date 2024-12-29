@@ -16,11 +16,12 @@ struct ProductCardView: View {
         VStack {
             ZStack(alignment: .topTrailing) {
                 AsyncImage(url: URL(string: product.image)) { image in
-                    image.resizable().aspectRatio(contentMode: .fill)
+                    image.resizable()
+                        .scaledToFit()
                 } placeholder: {
                     Color.gray
                 }
-                .frame(height: 120)
+                .frame(height: 180) // Sabit görsel yüksekliği
                 .cornerRadius(8)
 
                 Button(action: {
@@ -36,12 +37,18 @@ struct ProductCardView: View {
                 }
             }
 
+            Spacer() // İçeriği eşit şekilde hizalamak için
+
             Text(product.name)
                 .font(.headline)
+                .multilineTextAlignment(.center)
+                .lineLimit(2) // Uzun metinleri sınırlamak için
 
             Text("\(product.price)₺")
                 .font(.subheadline)
                 .foregroundColor(.blue)
+
+            Spacer()
 
             Button(action: {
                 cartViewModel.addToCart(product: product)
@@ -56,6 +63,7 @@ struct ProductCardView: View {
             }
         }
         .padding()
+        .frame(maxWidth: .infinity)
         .background(Color.white)
         .cornerRadius(10)
         .shadow(radius: 5)
