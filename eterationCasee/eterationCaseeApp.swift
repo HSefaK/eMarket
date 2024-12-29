@@ -5,16 +5,46 @@
 //  Created by Hüseyin Sefa Küçük on 28.12.2024.
 //
 
+// Main App
 import SwiftUI
 
 @main
-struct eterationCaseeApp: App {
-    let persistenceController = PersistenceController.shared
-
+struct EMarketApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            MainTabView()
+                .environmentObject(CartViewModel())
+        }
+    }
+}
+
+// Main Tab View
+struct MainTabView: View {
+    @StateObject private var favoritesViewModel = FavoritesViewModel()
+
+    var body: some View {
+        TabView {
+            ProductListView()
+                .environmentObject(favoritesViewModel)
+                .tabItem {
+                    Label("Products", systemImage: "house")
+                }
+
+            FavoritesView()
+                .environmentObject(favoritesViewModel)
+                .tabItem {
+                    Label("Favorites", systemImage: "star")
+                }
+
+            CartView()
+                .tabItem {
+                    Label("Cart", systemImage: "cart")
+                }
+
+            ProfileView()
+                .tabItem {
+                    Label("Profile", systemImage: "person")
+                }
         }
     }
 }
